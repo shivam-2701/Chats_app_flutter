@@ -1,12 +1,17 @@
+import 'package:chat_app/models/message.dart';
+import 'package:chat_app/repositories/firebase_repo.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../models/chat.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/message_tile.dart';
 
 class GlobalChatScreen extends StatelessWidget {
-  GlobalChatScreen({super.key});
+  GlobalChatScreen({
+    super.key,
+  });
 
   final controller = TextEditingController();
   final uid = FirebaseAuth.instance.currentUser?.uid;
@@ -19,15 +24,18 @@ class GlobalChatScreen extends StatelessWidget {
     }
     controller.clear();
 
-    final user =
-        await FirebaseFirestore.instance.collection("users").doc(uid).get();
-
-    await FirebaseFirestore.instance.collection("global_chat").add({
-      "msgData": msg,
-      "senderId": uid,
-      "username": (user.data() as Map<String, dynamic>)["username"],
-      "timestamp": Timestamp.now(),
-    });
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      final newMessage = Message(
+        message: msg,
+        createdOn: DateTime.now(),
+        senderUID: user!.uid,
+        senderName: user.displayName!,
+      );
+      await FirebaseRepo.postGlobalMessage(message: newMessage);
+    } catch (err) {
+      rethrow;
+    }
   }
 
   @override
@@ -39,8 +47,7 @@ class GlobalChatScreen extends StatelessWidget {
             child: CircularProgressIndicator(),
           );
         }
-        var data = snapshot.data?.docs
-            as List<QueryDocumentSnapshot<Map<String, dynamic>>>;
+        var data = snapshot.data!;
         return Column(
           children: [
             Expanded(
@@ -52,12 +59,12 @@ class GlobalChatScreen extends StatelessWidget {
                   itemBuilder: (context, index) {
                     return MessageTile(
                       showUserName: true,
-                      username: data[index].data()["username"],
-                      isMe: data[index].data()["senderId"] == uid,
-                      msg: data[index].data()["msgData"],
+                      username: data[index].senderName,
+                      isMe: data[index].senderUID == uid,
+                      msg: data[index].message,
                     );
                   },
-                  itemCount: snapshot.data?.docs.length,
+                  itemCount: snapshot.data?.length,
                 ),
               ),
             ),
@@ -77,13 +84,7 @@ class GlobalChatScreen extends StatelessWidget {
           ],
         );
       },
-      stream: FirebaseFirestore.instance
-          .collection("global_chat")
-          .orderBy(
-            "timestamp",
-            descending: true,
-          )
-          .snapshots(),
+      stream: FirebaseRepo.fetchGlobalChat(),
     );
   }
 }

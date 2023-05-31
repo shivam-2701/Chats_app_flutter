@@ -1,9 +1,9 @@
 import 'dart:io';
 
+import 'package:chat_app/repositories/firebase_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
-import "../helpers/firebase_helper.dart";
 
 enum AuthStatus {
   login,
@@ -62,24 +62,24 @@ class _AuthScreenState extends State<AuthScreen> {
     _formKey.currentState?.save();
     try {
       if (_authStatus == AuthStatus.signUp) {
-        _user = await FirebaseHelper.signUp(
+        _user = await FirebaseRepo.signUp(
           _formData['email'],
           _formData['password'],
         );
 
-        final url = await FirebaseHelper.uploadImage(
+        final url = await FirebaseRepo.uploadImage(
           imagePath: _user?.user?.uid,
           fileName: _userImage,
         );
 
-        FirebaseHelper.setUserData(
+        FirebaseRepo.setUserData(
           path: _user?.user?.uid,
           username: _formData["username"],
           email: _formData["email"],
           imageUrl: url,
         );
       } else {
-        _user = await FirebaseHelper.signIn(
+        _user = await FirebaseRepo.signIn(
           _formData["email"] as String,
           _formData["password"] as String,
         );

@@ -26,8 +26,7 @@ class ChatListScreen extends StatelessWidget {
       ),
       body: StreamBuilder(
         builder: (context, snapshot) {
-          // ignore: prefer_is_empty
-          if (snapshot.data?.docs.length == 0) {
+          if (snapshot.data?.docs.isEmpty ?? true) {
             return const NewUser();
           }
           return snapshot.connectionState == ConnectionState.waiting

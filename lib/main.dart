@@ -2,6 +2,7 @@
 
 import 'package:chat_app/screens/chat_screen.dart';
 import 'package:chat_app/screens/user_list_screen.dart';
+import 'package:chat_app/theme/app_theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -48,35 +49,8 @@ class _MyAppState extends State<MyApp> {
       length: 2,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          androidOverscrollIndicator: AndroidOverscrollIndicator.stretch,
-          colorScheme: ColorScheme.light(
-            primary: const Color.fromARGB(255, 30, 189, 152),
-            secondary: Colors.tealAccent[100] as Color,
-          ),
-          iconTheme: const IconThemeData(
-            size: 25,
-          ),
-          appBarTheme: const AppBarTheme(
-            elevation: 2,
-            systemOverlayStyle: SystemUiOverlayStyle.light,
-          ),
-        ),
-        darkTheme: ThemeData(
-          androidOverscrollIndicator: AndroidOverscrollIndicator.stretch,
-          colorScheme: ColorScheme.dark(
-            primary: const Color.fromARGB(255, 30, 189, 152),
-            secondary: Colors.tealAccent[100] as Color,
-          ),
-          iconTheme: const IconThemeData(
-            size: 25,
-          ),
-          appBarTheme: const AppBarTheme(
-            elevation: 2,
-            systemOverlayStyle: SystemUiOverlayStyle.light,
-            backgroundColor: Color.fromARGB(255, 30, 189, 152),
-          ),
-        ),
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
         home: StreamBuilder(
           stream: FirebaseAuth.instance.authStateChanges(),
           builder: (context, snapshot) =>
