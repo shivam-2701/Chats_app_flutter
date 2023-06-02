@@ -5,7 +5,6 @@ import 'package:chat_app/models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 
 import '../models/constants.dart';
@@ -121,8 +120,8 @@ class FirebaseRepo {
     String username,
   ) async {
     final user = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-      email: email as String,
-      password: password as String,
+      email: email,
+      password: password,
     );
     await FirebaseAuth.instance.currentUser?.updateDisplayName(username);
     return user;

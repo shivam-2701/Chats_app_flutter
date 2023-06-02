@@ -2,7 +2,6 @@ import 'package:chat_app/repositories/firebase_repo.dart';
 import 'package:chat_app/screens/chat_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import "package:cloud_firestore/cloud_firestore.dart";
 
 class UserListScreen extends StatelessWidget {
   static const routeName = "/users";

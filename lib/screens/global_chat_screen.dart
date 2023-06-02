@@ -2,9 +2,7 @@ import 'package:chat_app/models/message.dart';
 import 'package:chat_app/repositories/firebase_repo.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../models/chat.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/message_tile.dart';
 
