@@ -1,3 +1,4 @@
+import 'package:chat_app/repositories/firebase_repo.dart';
 import 'package:chat_app/screens/chat_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -16,50 +17,42 @@ class UserListScreen extends StatelessWidget {
         title: const Text("Select User"),
       ),
       body: FutureBuilder(
-        future: FirebaseFirestore.instance
-            .collection("users")
-            .orderBy("username")
-            .get(),
-        builder: (context, snapshot) =>
-            snapshot.connectionState == ConnectionState.waiting
-                ? const Center(
-                    child: CircularProgressIndicator(),
-                  )
-                : ListView.builder(
-                    itemBuilder: (context, index) =>
-                        snapshot.data?.docs[index].id == uid
-                            ? const SizedBox(
-                                height: 0,
-                              )
-                            : ListTile(
-                                onTap: () async {
-                                  final id =
-                                      snapshot.data?.docs[index].id as String;
+        builder: (context, snapshot) => snapshot.connectionState ==
+                ConnectionState.waiting
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : ListView.builder(
+                itemBuilder: (context, index) {
+                  final data = snapshot.data![index];
 
-                                  Navigator.of(context).pushNamed(
-                                    ChatScreen.routeName,
-                                    arguments: id,
-                                  );
-                                },
-                                title: Text(
-                                  (snapshot.data?.docs[index].data()
-                                      as Map<String, dynamic>)["username"],
-                                ),
-                                leading: Hero(
-                                  tag: (snapshot.data?.docs[index].data()
-                                      as Map<String, dynamic>)["image_url"],
-                                  child: CircleAvatar(
-                                    backgroundImage: NetworkImage(
-                                      (snapshot.data?.docs[index].data()
-                                          as Map<String, dynamic>)["image_url"],
-                                    ),
-                                    backgroundColor:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                ),
-                              ),
-                    itemCount: snapshot.data?.size,
-                  ),
+                  return ListTile(
+                    onTap: () async {
+                      final id = data.uid;
+                      if (uid == id) return;
+
+                      Navigator.of(context).pushNamed(
+                        ChatScreen.routeName,
+                        arguments: id,
+                      );
+                    },
+                    title: Text(
+                      data.username,
+                    ),
+                    leading: Hero(
+                      tag: data.uid,
+                      child: CircleAvatar(
+                        backgroundImage: NetworkImage(
+                          data.image,
+                        ),
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                  );
+                },
+                itemCount: snapshot.data?.length,
+              ),
+        future: FirebaseRepo.fetchAllUsers(),
       ),
     );
   }

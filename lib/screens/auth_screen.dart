@@ -63,8 +63,9 @@ class _AuthScreenState extends State<AuthScreen> {
     try {
       if (_authStatus == AuthStatus.signUp) {
         _user = await FirebaseRepo.signUp(
-          _formData['email'],
-          _formData['password'],
+          _formData['email'] ?? '',
+          _formData['password'] ?? '',
+          _formData["username"] ?? '',
         );
 
         final url = await FirebaseRepo.uploadImage(
@@ -196,7 +197,7 @@ class _AuthScreenState extends State<AuthScreen> {
                               label: Text("Username"),
                             ),
                             keyboardType: TextInputType.name,
-                            textCapitalization: TextCapitalization.words,
+                            textCapitalization: TextCapitalization.none,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return "Enter a valid username.";

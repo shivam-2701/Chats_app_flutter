@@ -42,12 +42,14 @@ class GlobalChatScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return StreamBuilder(
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+        if (!snapshot.hasData) {
           return const Center(
             child: CircularProgressIndicator(),
           );
         }
+
         var data = snapshot.data!;
+
         return Column(
           children: [
             Expanded(

@@ -6,7 +6,6 @@ import 'package:chat_app/theme/app_theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 
 import 'firebase_options.dart';

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:chat_app/models/message.dart';
+import 'package:chat_app/models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -11,20 +12,29 @@ import '../models/constants.dart';
 import '../models/chat.dart';
 
 class FirebaseRepo {
-  static Stream<Chat> fetchAllChats() async* {
+  static Stream<List<Chat>> fetchAllChats() async* {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
         throw Exception("Authorization error. Kindly re-login.");
       }
-      final stream =
-          Constants.userCollection.doc("${user.uid}/chats").snapshots().map(
+      final stream = Constants.userCollection
+          .doc(user.uid)
+          .collection("chats")
+          .snapshots()
+          .map(
         (snapshot) {
-          final dataMap = snapshot.data()!;
-          return Chat.fromJSON(dataMap: {
-            ...dataMap,
-            "id": snapshot.id,
-          });
+          final dataList = snapshot.docs;
+          return dataList
+              .map(
+                (dataMap) => Chat.fromJSON(
+                  dataMap: {
+                    ...dataMap.data(),
+                    "id": dataMap.id,
+                  },
+                ),
+              )
+              .toList();
         },
       );
       yield* stream;
@@ -45,7 +55,7 @@ class FirebaseRepo {
 
       final stream = Constants.globalChatsCollection
           .orderBy(
-            "timestamp",
+            "created_on",
             descending: true,
           )
           .snapshots()
@@ -90,12 +100,31 @@ class FirebaseRepo {
     }
   }
 
-  static Future<UserCredential> signUp(String? email, String? password) async {
+  static Future<List<UserModel>> fetchAllUsers() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception("Authorization Error. Kindly re-login.");
+    }
+    final response = await Constants.userCollection.orderBy("username").get();
+    return response.docs.map((snapshot) {
+      final dataMap = snapshot.data();
+      return UserModel.fromJSON(dataMap: {
+        ...dataMap,
+        "id": snapshot.id,
+      });
+    }).toList();
+  }
+
+  static Future<UserCredential> signUp(
+    String email,
+    String password,
+    String username,
+  ) async {
     final user = await FirebaseAuth.instance.createUserWithEmailAndPassword(
       email: email as String,
       password: password as String,
     );
-
+    await FirebaseAuth.instance.currentUser?.updateDisplayName(username);
     return user;
   }
 
